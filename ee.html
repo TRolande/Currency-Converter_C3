@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            /* Blue and white gradient background */
+            background: linear-gradient(135deg, #ffffff 0%, #2563eb 100%);
+        }
+
+        .converter-container {
+            background-color: white;
+            padding: 40px;           /* Increased padding */
+            border-radius: 12px;     /* Slightly larger corners */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            max-width: 800px;        /* Increased width */
+            margin: 30px auto;       /* More vertical space */
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #ff9800; /* Orange */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #e65100; /* Darker orange */
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            color: #333;
+        }
+
+        #thankyou {
+            text-align: center;
+            color: #2563eb;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        #history {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f0f8ff;
+            border-radius: 6px;
+            font-size: 15px;
+            color: #222;
+        }
+
+        #history h2 {
+            margin-top: 0;
+            font-size: 18px;
+            color: #444;
+        }
+
+        #history ul {
+            padding-left: 20px;
+        }
+
+        #welcome {
+            text-align: center;
+            color: #2563eb;
+            font-size: 18px;
+            margin-bottom: 18px;
+        }
+
+        #feedback-section {
+            margin-top: 30px;
+        }
+
+        #feedback-section h2 {
+            font-size: 18px;
+            color: #444;
+        }
+
+        #feedback {
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #bbb;
+            padding: 8px;
+        }
+
+        #submitFeedback {
+            margin-top: 10px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 10px;
+            width: 100%;
+        }
+
+        #submitFeedback:hover {
+            background: #003da5;
+        }
+
+        #feedbackMsg {
+            margin-top: 10px;
+            color: #2563eb;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align:center; color:#ff9800; margin-bottom:10px;">Converter</h1>
+    <div id="welcome">
+        Welcome! Feel free to enter your entries.
+    </div>
+    <div class="converter-container">
+        <h1>Currency Converter</h1>
+        <div class="form-group">
+            <label for="fromCurrency">Convert from:</label>
+            <select id="fromCurrency">
+                <option value="USD">USD</option>
+                <option value="JPY">JPY</option>
+                <option value="EUR">EUR</option>
+                <option value="RUB">RUB</option>
+                <option value="GBP">GBP</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="toCurrency">Convert to:</label>
+            <select id="toCurrency">
+                <option value="USD">USD</option>
+                <option value="JPY">JPY</option>
+                <option value="EUR">EUR</option>
+                <option value="RUB">RUB</option>
+                <option value="GBP">GBP</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" min="0" step="0.01" placeholder="Enter amount">
+        </div>
+
+        <button onclick="convert()">Convert</button>
+        <div id="result"></div>
+        <div id="thankyou" style="text-align:center; color:#2563eb; font-size:16px; margin-top:10px;"></div>
+        <div id="history">
+            <h2>Conversion History</h2>
+            <ul id="historyList"></ul>
+        </div>
+
+        <div id="feedback-section" style="margin-top:30px;">
+            <h2 style="font-size:18px; color:#444;">Feedback</h2>
+            <textarea id="feedback" rows="3" style="width:100%; border-radius:6px; border:1px solid #bbb; padding:8px;" placeholder="Let us know your thoughts..."></textarea>
+            <button id="submitFeedback" style="margin-top:10px; background:#2563eb;">Submit Feedback</button>
+            <div id="feedbackMsg" style="margin-top:10px; color:#2563eb; text-align:center;"></div>
+        </div>
+    </div>
+
+    <script>
+        const currencies = {
+            USD: 1.0,
+            JPY: 113.5,
+            EUR: 0.89,
+            RUB: 74.36,
+            GBP: 0.75
+        };
+
+        function convert() {
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const resultDiv = document.getElementById('result');
+            const historyList = document.getElementById('historyList');
+            const thankyouDiv = document.getElementById('thankyou');
+
+            if (isNaN(amount)) {
+                resultDiv.innerHTML = 'Please enter a valid amount';
+                thankyouDiv.innerHTML = '';
+                return;
+            }
+
+            if (currencies[toCurrency] && currencies[fromCurrency]) {
+                const convertedAmount = (amount * currencies[toCurrency]) / currencies[fromCurrency];
+                const resultText = `${amount} ${fromCurrency} = ${convertedAmount.toFixed(2)} ${toCurrency}`;
+                resultDiv.innerHTML = resultText;
+
+                // Add to history
+                const li = document.createElement('li');
+                li.textContent = resultText;
+                historyList.appendChild(li);
+
+                // Show thank you message
+                thankyouDiv.innerHTML = 'Thank you for using our application!';
+            } else {
+                resultDiv.innerHTML = 'Currency not found!';
+                thankyouDiv.innerHTML = '';
+            }
+        }
+    </script>
+</body>
+</html>
